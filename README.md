@@ -7,7 +7,7 @@ provides four commands, as well as a command handler:
 2. `\sudokufile` typesets a sudoku from a file if valid.
 3. `\solvesudoku` solves a sudoku if valid.
 3. `\solvesudokufile` solves a sudoku from a file if valid.
-5. '\setupsudoku' is the command handler for commands above.
+5. `\setupsudoku` is the command handler for commands above.
 
 `\setupsudoku` understands the following parameters:
 
