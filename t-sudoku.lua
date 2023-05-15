@@ -1,6 +1,6 @@
 if not modules then modules = { } end modules ['t-sudoku'] = 
 {
-  version   = "2023-05-14",
+  version   = "2023-05-15",
   comment   = "Sudokus for ConTeXt",
   author    = "Jairo A. del Rio",
   copyright = "Jairo A. del Rio",

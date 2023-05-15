@@ -9,7 +9,7 @@ provides four commands, as well as a command handler:
 3. `\solvesudokufile` solves a sudoku from a file if valid.
 5. '\setupsudoku' is the command handler for commands above.
 
-'\setupsudoku' understands the following parameters:
+`\setupsudoku` understands the following parameters:
 
 ```tex
 \setupsudoku
@@ -37,4 +37,4 @@ something like this:
      placeholderlabelc=Third error]
 ```
 
-For actual examples, chech `t-sudoku.mkvi`.
+For actual examples, check `t-sudoku.mkvi`.
