@@ -16,13 +16,13 @@ if not modules then modules = { } end modules ['t-sudoku'] =
 local table, math, io = table, math, io
 local ipairs, pairs, tostring = ipairs, pairs, tostring
 
-local floor, ceil = math.floor, math.ceil
+local floor, ceil, random = math.floor, math.ceil, math.random
 local insert, concat, sort = table.insert, table.concat, table.sort
 
 -- ConTeXt goodies
 
-local context    = context       
-local interfaces = interfaces
+local context, buffers, inferfaces = context, buffers, interfaces
+local getcontent = buffers.getcontent
 local implement  = interfaces.implement
 
 -- Take a look for definitions
@@ -1110,11 +1110,12 @@ random_sudoku = function(N)
   local N = N or 17
   local result = {}
   local values = {}
-  for _, v in ipairs(squares) do
+  for _, s in ipairs(squares) do
     values[s] = digits
   end
-  for _, v in ipairs(shuffle(squares)) do
-    if not assign(values, s, values[rows[random(9)]..columns[random(9)]]) then
+  for _, v in ipairs(shuffle(copy(squares))) do
+    local r = random(#values[v])
+    if not assign(values, v, values[v]:sub(r, r)) then
       break
     end
     local ds = {}
@@ -1126,7 +1127,7 @@ random_sudoku = function(N)
     if #ds >= N and #unique(ds) >= 8 then
       for _, i in ipairs(rows) do
         for _, j in ipairs(columns) do
-          insert(result, #values[i..j]>0 and values[i..j] or "0")
+          insert(result, #values[i..j] == 1 and values[i..j] or "0")
         end
       end
       return concat(result)
@@ -1139,7 +1140,8 @@ end
 
 local ctx_sudoku, ctx_solvesudoku, 
       ctx_sudokufile, ctx_solvesudokufile, 
-      ctx_randomsudoku, ctx_sudokufunction, 
+      ctx_sudokubuffer, ctx_sudokusolvebuffer,
+      ctx_randomsudoku, ctx_sudokufunction,
       ctx_typeset, ctx_error
 
 ctx_sudoku = function(grid, data)
@@ -1173,6 +1175,32 @@ ctx_solvesudoku = function(grid, data)
   end
 end
 
+ctx_sudokubuffer = function(buffer, data)
+  local ok, result = pcall(grid_values, getcontent(buffer))
+  if ok then
+    if result then
+      ctx_typeset(result, data)
+    else
+      ctx_error("c")
+    end
+  else
+    ctx_error("b")
+  end
+end
+
+ctx_sudokusolvebuffer = function(buffer, data)
+  local ok, result = pcall(solve, getcontent(buffer))
+  if ok then
+    if result then
+      ctx_typeset(result, data)
+    else
+      ctx_error("c")
+    end
+  else
+    ctx_error("b")
+  end
+end
+
 ctx_solvesudokufile = function(file, data)
   local ok, result = pcall(solve, loaddata(file))
   if ok then
@@ -1197,14 +1225,26 @@ end
 
 local ctx_sudokufunctions = 
 {
-  sudoku          = ctx_sudoku,
-  sudokufile      = ctx_sudokufile,
-  solvesudoku     = ctx_solvesudoku,
-  solvesudokufile = ctx_solvesudokufile
+  sudoku            = ctx_sudoku,
+  sudokufile        = ctx_sudokufile,
+  sudokubuffer      = ctx_sudokubuffer,
+  sudokusolvebuffer = ctx_sudokusolvebuffer,
+  solvesudoku       = ctx_solvesudoku,
+  solvesudokufile   = ctx_solvesudokufile
 }
 
 ctx_sudokufunction = function(t)
   ctx_sudokufunctions[t.name](t.content, t)
+end
+
+ctx_randomsudoku = function(data)
+  local n = tonumber(data.n)
+  if n < 17 then
+    ctx_error("d")
+    return
+  end
+  local result = grid_values(random_sudoku(tonumber(n)))
+  ctx_typeset(result, data)
 end
 
 ctx_typeset = function(grid, data)
@@ -1234,4 +1274,10 @@ implement{
   name      = "sudokufunction",
   arguments = {"hash"},
   actions   = ctx_sudokufunction
+}
+
+implement{
+  name      = "randomsudoku",
+  arguments = {"hash"},
+  actions   = ctx_randomsudoku
 }

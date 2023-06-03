@@ -1,6 +1,6 @@
 %D \module
 %D   [     file=t-sudoku,
-%D      version=2023-05-15,
+%D      version=2023-06-03,
 %D        title=\CONTEXT\ User Module,
 %D     subtitle=Sudokus for ConTeXt,
 %D       author=Jairo A. del Rio,
@@ -68,6 +68,7 @@
    \v!odd\c!background=\v!color,
    \v!even\c!backgroundcolor=white,     
    \v!odd\c!backgroundcolor=gray,
+   \c!n=42,
    \c!placeholder\c!label a=Invalid sudoku,
    \c!placeholder\c!label b=Invalid sudoku file,
    \c!placeholder\c!label c=Impossible to find a solution,
@@ -91,7 +92,7 @@
    \bTABLE
     [\c!align=\sudokuparameter\c!align,
      \c!width=\sudokuparameter\c!size,
-     \c!height=\sudokuparameter\c!size]
+     \c!height=\sudokuparameter\c!size]%
      \clf_sudokufunction
       [name                =#name,
        content             ={#content},
@@ -102,10 +103,35 @@
    \eTABLE%
    \endgroup}
 
+%D Random sudokus
+
+\unexpanded\def\randomsudoku{\dosingleempty\randomsudoku_direct}
+
+\def\randomsudoku_direct[#parameters]%
+  {\begingroup%
+   \iffirstargument
+   \setupTABLE[#parameters]%
+    \setupsudokus[#parameters]%
+   \fi
+   \bTABLE
+    [\c!align=\sudokuparameter\c!align,
+     \c!width=\sudokuparameter\c!size,
+     \c!height=\sudokuparameter\c!size]%
+   \clf_randomsudoku
+    [n                   =\sudokuparameter\c!n,
+     evenbackground      =\sudokuparameter{\v!even\c!background},
+     oddbackground       =\sudokuparameter{\v!odd\c!background},
+     evenbackgroundcolor =\sudokuparameter{\v!even\c!backgroundcolor},
+     oddbackgroundcolor  =\sudokuparameter{\v!odd\c!backgroundcolor}]
+   \eTABLE%
+   \endgroup}
+
 %D Sudoku macros
 
 \def\sudoku{\sudokufunction_name[sudoku]}
 \def\sudokufile{\sudokufunction_name[sudokufile]}
+\def\sudokubuffer{\sudokufunction_name[sudokubuffer]}
+\def\sudokusolvebuffer{\sudokufunction_name[sudokusolvebuffer]}
 \def\solvesudoku{\sudokufunction_name[solvesudoku]}
 \def\solvesudokufile{\sudokufunction_name[solvesudokufile]}
 
@@ -185,6 +211,24 @@
 
 \stopsection
 
+\startbuffer[lmao]
+.......... .......1 .....2.3.
+....1...4. .3.5.... .26....7.
+14...8...5 ........ 7....6.2.
+\stopbuffer
+
+\startsection[title={\type{\sudokubuffer}}]
+
+\sudokubuffer{lmao}
+
+\stopsection
+
+\startsection[title={\type{\sudokusolvebuffer}}]
+
+\sudokusolvebuffer{lmao}
+
+\stopsection
+
 \startsection[title={\type{\sudokufile}}]
 
 \sudokufile[evenbackgroundcolor=cornsilk,oddbackgroundcolor=pink]{t-sudoku-test-01.txt}
@@ -211,6 +255,12 @@
 \blank[line]
 
 \solvesudokufile{t-sudoku-test-03.txt}
+
+\stopsection
+
+\startsection[title={\type{\randomsudoku}}]
+
+\randomsudoku[n=45]
 
 \stopsection
 
