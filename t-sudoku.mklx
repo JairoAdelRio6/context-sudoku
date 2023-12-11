@@ -1,6 +1,6 @@
 %D \module
 %D   [     file=t-sudoku,
-%D      version=2023-06-03,
+%D      version=2023-12-25,
 %D        title=\CONTEXT\ User Module,
 %D     subtitle=Sudokus for ConTeXt,
 %D       author=Jairo A. del Rio,
@@ -43,7 +43,7 @@
 
 %D As always, Lua does the hard job
 
-\ctxloadluafile{t-sudoku}
+\registerctxluafile{t-sudoku}{autosuffix}
 
 \unprotect
 
@@ -54,7 +54,7 @@
 
 %D Some aliases
 
-\let\setupsudokus\setupsudoku
+\aliased\let\setupsudokus\setupsudoku
 
 %D Basic setups
 %D
@@ -72,79 +72,84 @@
    \c!placeholder\c!label a=Invalid sudoku,
    \c!placeholder\c!label b=Invalid sudoku file,
    \c!placeholder\c!label c=Impossible to find a solution,
-   \c!placeholder\c!command=\framed]
+   \c!placeholder\c!command=\framed,
+   \c!renderingsetup=\v!color]
 
-%D A generic sudoku generator macro
-%D Yeah, I'm that lazy
+\startsetups[\????sudoku:\c!renderingsetup:\v!none]
+\stopsetups
 
-\unexpanded\def\sudokufunction_name{\dodoubleempty\sudokufunction_direct}
+\startsetups[\????sudoku:\c!renderingsetup:\v!color]
+\expandedrepeat\plusnine%
+  {\expandedrepeat\plusnine%
+    {\ifnumexpression((##I+1)/3 + (##P+1)/3) mod 2\relax
+      \setupTABLE[##I][##P]
+        [\c!background=\v!color,
+         \c!backgroundcolor=\sudokuparameter{\v!even\c!backgroundcolor}]
+     \else
+      \setupTABLE[##I][##P]
+        [\c!background=\v!color,
+         \c!backgroundcolor=\sudokuparameter{\v!odd\c!backgroundcolor}]
+     \fi}}
+\stopsetups
 
 %D Passing values to TABLE's is easier and unknown keys will be ignored. 
 %D However, we need to enforce a square shape.Hence the need to passing 
 %D values twice.
 
-\def\sudokufunction_direct[#name][#parameters]#content%
+\tolerant\def\sudokufunction_name[#name]#*[#parameters]#:#content%
   {\begingroup%
-   \ifsecondargument
-     \setupTABLE[#parameters]%
+   \ifparameter#parameters\or
      \setupsudokus[#parameters]%
    \fi
    \bTABLE
-    [\c!align=\sudokuparameter\c!align,
+    [#parameters,
+     \c!align=\sudokuparameter\c!align,
      \c!width=\sudokuparameter\c!size,
      \c!height=\sudokuparameter\c!size]%
+     \directsetup{\????sudoku:\c!renderingsetup:\sudokuparameter\c!renderingsetup}%
      \clf_sudokufunction
-      [name                =#name,
-       content             ={#content},
-       evenbackground      =\sudokuparameter{\v!even\c!background},
-       oddbackground       =\sudokuparameter{\v!odd\c!background},
-       evenbackgroundcolor =\sudokuparameter{\v!even\c!backgroundcolor},
-       oddbackgroundcolor  =\sudokuparameter{\v!odd\c!backgroundcolor}]
+       name    {#name}
+       content {#content}
+     \relax
    \eTABLE%
    \endgroup}
 
 %D Random sudokus
 
-\unexpanded\def\randomsudoku{\dosingleempty\randomsudoku_direct}
-
-\def\randomsudoku_direct[#parameters]%
+\permanent\protected\tolerant\def\randomsudoku[#parameters]%
   {\begingroup%
-   \iffirstargument
-   \setupTABLE[#parameters]%
+   \ifparameter#1\or
     \setupsudokus[#parameters]%
    \fi
    \bTABLE
-    [\c!align=\sudokuparameter\c!align,
+    [#parameters,
+     \c!align=\sudokuparameter\c!align,
      \c!width=\sudokuparameter\c!size,
      \c!height=\sudokuparameter\c!size]%
-   \clf_randomsudoku
-    [n                   =\sudokuparameter\c!n,
-     evenbackground      =\sudokuparameter{\v!even\c!background},
-     oddbackground       =\sudokuparameter{\v!odd\c!background},
-     evenbackgroundcolor =\sudokuparameter{\v!even\c!backgroundcolor},
-     oddbackgroundcolor  =\sudokuparameter{\v!odd\c!backgroundcolor}]
+   \directsetup{\????sudoku:\c!renderingsetup:\sudokuparameter\c!renderingsetup}%
+   \clf_randomsudoku\numexpr\sudokuparameter\c!n\relax%
    \eTABLE%
    \endgroup}
 
 %D Sudoku macros
 
-\def\sudoku{\sudokufunction_name[sudoku]}
-\def\sudokufile{\sudokufunction_name[sudokufile]}
-\def\sudokubuffer{\sudokufunction_name[sudokubuffer]}
-\def\sudokusolvebuffer{\sudokufunction_name[sudokusolvebuffer]}
-\def\solvesudoku{\sudokufunction_name[solvesudoku]}
-\def\solvesudokufile{\sudokufunction_name[solvesudokufile]}
+\permanent\protected\def\sudoku{\sudokufunction_name[sudoku]}
+\permanent\protected\def\sudokufile{\sudokufunction_name[sudokufile]}
+\permanent\protected\def\sudokubuffer{\sudokufunction_name[sudokubuffer]}
+\permanent\protected\def\sudokusolvebuffer{\sudokufunction_name[sudokusolvebuffer]}
+\permanent\protected\def\solvesudoku{\sudokufunction_name[solvesudoku]}
+\permanent\protected\def\solvesudokufile{\sudokufunction_name[solvesudokufile]}
 
 %D More aliases
 
-\let\solvedsudoku\solvesudoku
-\let\solvedsudokufile\solvesudokufile
+\aliased\let\solvedsudoku\solvesudoku
+\aliased\let\solvedsudokufile\solvesudokufile
 
 \protect
 
 \stopmodule
 
-\continueifinputfile{t-sudoku.mkvi}
+\continueifinputfile{t-sudoku.mklx}
 
 %D Some examples
 
@@ -163,7 +168,7 @@
 
 \blank[line]
 
-\sudoku{
+\sudoku[renderingsetup=color]{
 000000001 000002030 004056000
 000004500 010700000 080000400
 000030000 000100008 205000000
