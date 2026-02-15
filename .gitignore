@@ -1,5 +1,10 @@
-*.log
-*.pdf
 *.tuc
+*.tua
+*.tui
+*.bak
+*.log
+*.tmp
+*.pdf
 *.synctex
+*.syncctx
 /t-sudoku.zip

@@ -17,6 +17,6 @@ build:
   cp "LICENSE" "VERSION" "CHANGELOG.md" "README.md" "{{temp_folder}}"
   cp "{{tex_module_file}}" "{{mp_module_file}}" "{{mplua_module_file}}" "{{tex_folder}}"
   cp "t-sudoku-test-01.txt" "t-sudoku-test-02.txt" "t-sudoku-test-03.txt" "{{doc_folder}}"
-  mv "{{tex_doc_file}}" "{{doc_folder}}"
+  cp "{{tex_doc_file}}" "{{doc_folder}}"
   cd "{{temp_folder}}" && zip -r "../{{zip_file}}" .
   rm -rf "{{temp_folder}}"
