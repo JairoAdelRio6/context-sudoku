@@ -1,5 +1,5 @@
 *.tex text
 *.lua text
-*.mklx text diff=tex linguist-language=tex
-*.mkxl text diff=tex linguist-language=tex
-*.lmt  text diff=lua linguist-language=lua
+*.mklx text diff=tex gitlab-language=tex linguist-language=tex
+*.mkxl text diff=tex gitlab-language=tex linguist-language=tex
+*.lmt  text diff=lua gitlab-language=lua linguist-language=lua

@@ -1,45 +1,84 @@
 # sudoku
 
-This is a ConTeXt port of a famous sudoku solver by Peter Norvig. It
-provides five commands, as well as a command handler:
+ConTeXt module to solve and display sudokus using the famous solver by Peter
+Norvig. The module has been reworked so that sudokus can be displayed directly
+in running text or within Metafun graphics as another library.
+
+This module provides the following commands, as well as a command handler:
 
 1. `\sudoku` typesets a sudoku if valid.
-2. `\sudokufile` typesets a sudoku from a file if valid.
-3. `\solvesudoku` solves a sudoku if valid.
-4. `\solvesudokufile` solves a sudoku from a file if valid.
-5. `\randomsudoku` creates a random, unsolved sudoku.
-6. `\sudokubuffer` typesets a sudoku from a buffer.
-7. `\solvesudokubuffer` solves a sudoku from a buffer if valid.
-8. `\setupsudoku` is the command handler for commands above.
+2. `\startsudoku` and `\stopsudoku` do the same as `\sudoku`, but text goes
+   inside the environment.
+3. `\sudokufile` typesets a sudoku from a file if valid.
+4. `\solvesudoku` solves a sudoku if valid.
+5. `\startsolvesudoku` and `\stopsolvesudoku` do the same as `\solvesudoku`, but
+   text goes inside the environment.
+6. `\solvesudokufile` solves a sudoku from a file if valid.
+7. `\randomsudoku` creates a random, unsolved sudoku.
+8. `\sudokubuffer` typesets a sudoku from a buffer.
+9. `\solvesudokubuffer` solves a sudoku from a buffer if valid.
+10. `\setupsudoku` is the command handler for commands above.
 
 `\setupsudoku` understands the following parameters:
 
 ```tex
 \setupsudoku
-    [size=2em,
-     align={middle,lohi},
-     evenbackground=color,
-     oddbackground=color,
-     evenbackgroundcolor=darkred,
-     oddbackgroundcolor=darkblue,
-     n=17] % for random sudokus
+  [size=2em,
+   evenbackground=,
+   oddbackground=gray,
+   frame=on,
+   rulethickness=.5bp,
+   n=42] % for random sudokus
 ```
 
-As you might notice, sudokus are just `TABLE`'s in disguise, but only
-certain parameters are passed in order to enforce constraints and keep
-a sudoku in square shape.
-
-If an invalid sudoku or sudoku file is provided, a placeholder with an
-error message is printed instead. To change message errors, set
-something like this:
+`\sudoku` and `\solvesudoku` receive a `text` argument:
 
 ```tex
-\setupsudoku
-    [placeholdercommand=\inframed,
-     placeholderlabela=First error,
-     placeholderlabelb=Second error,
-     placeholderlabelc=Third error,
-     placeholderlabeld=Number too low]
+\solvesudoku[text=...]
 ```
 
-For actual examples, check `t-sudoku.mkvi`.
+`\sudokufile` and `\solvesudokufile` receive a `file` argument:
+
+```tex
+\sudokufile[file=...]
+```
+
+`\sudokubuffer` and `\solvesudokubuffer` receive a `buffer` argument:
+
+```tex
+\solvesudokubuffer[buffer=...]
+```
+```
+```
+```
+```
+```
+```
+
+Within Metafun, however, `lmt_sudoku` is generic and only understands a `text`
+parameter. There are three possible alternatives: `display` (to display a sudoku
+from a string without solving), `solve` (to solve a sudoku from a string), and
+`random` (to generate a random sudoku with N hints, ignoring any `text`
+argument).
+
+```metapost
+lmt_sudoku [
+      alternative = "display",
+             text = "...",
+             size = 2EmWidth,
+   evenbackground = "",
+    oddbackground = "red",
+            frame = "one",
+    rulethickness = .5bp,
+                n = 42 % for random sudokus
+]
+```
+
+Since `lmt_sudoku` draws directly a sudoku, you need to wrap it in an `image` if
+further manipulation is required.
+
+See examples on `t-sudoku.mklx`
+
+_Caveat emptor_: this module is only for ConTeXt LMTX. I no longer use ConTeXt
+MKIV, so no support is provided, sorry. Moreover, I'm using cutting-edge
+features, such as new macro extensions. An updated distribution is recommended.
